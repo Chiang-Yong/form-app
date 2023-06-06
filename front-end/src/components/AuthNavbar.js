@@ -11,7 +11,7 @@ import {
   Tooltip,
   ListItemIcon,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/material/Avatar";
 import PersonAdd from "@mui/icons-material/PersonAdd";
@@ -22,20 +22,28 @@ import Link from '@mui/material/Link';
 import { useAuth } from "./AuthProvider";
 import { useNavigate } from "react-router-dom";
 import Axios from "axios";
+import { UserContext } from "./UserContext";
 
 const pages = [
   { title: "Dashboard", path: "/dashboard" },
   { title: "Programs", path: "/programs" },
 ];
-const accounts = [
+const admin = [
   { title: "Profile", icon: <Avatar fontSize="small" />,path:"/profile" },
   { title: "Add account", icon: <PersonAdd fontSize="small" />,path:"/addAccount" },
   { title: "Settings", icon: <Settings fontSize="small" />,path:"/settings" },
   { title: "Logout", icon: <Logout fontSize="small" />, path:"logout" },
 ];
 
+const accounts = [
+  { title: "Profile", icon: <Avatar fontSize="small" />,path:"/profile" },
+  { title: "Settings", icon: <Settings fontSize="small" />,path:"/settings" },
+  { title: "Logout", icon: <Logout fontSize="small" />, path:"logout" },
+];
+
 const AuthNavbar = () => {
   const { setAuth, user } = useAuth();
+  const { setUserInfo, userInfo } = useContext(UserContext);
   const navigate = useNavigate();
 
   const logout = async ()=> {
@@ -45,6 +53,7 @@ const AuthNavbar = () => {
     )
     console.log(res.data)
     setAuth(false)
+    setUserInfo("")
     navigate("/login")
   }
 
@@ -124,9 +133,11 @@ const AuthNavbar = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="HCY" src="/static/images/avatar/2.jpg" />
-              </IconButton>
+                <Avatar alt={userInfo.lastName} src="/static/images/avatar/2.jpg" />
+              </IconButton>             
             </Tooltip>
+            <Typography>{userInfo.firstName}, {userInfo.roles[0]}</Typography>
+           { console.log("user data: " + JSON.stringify(userInfo)) }
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
@@ -169,14 +180,33 @@ const AuthNavbar = () => {
                 },
               }}
             >
-              {accounts.map((account) => (
+              {(userInfo.roles[0] === "admin") ? (
+              
+                <>
+                {admin.map((account) => (
                 <MenuItem key={account} onClick={handleCloseUserMenu}>
                   <ListItemIcon>{account.icon}</ListItemIcon>
                   <Link href={account.path} underline="none" >
                   <Typography textAlign="center">{account.title}</Typography>
                   </Link>
                 </MenuItem>
+                
               ))}
+              </>)
+              :(
+                <>
+                {accounts.map((account) => (
+                <MenuItem key={account} onClick={handleCloseUserMenu}>
+                  <ListItemIcon>{account.icon}</ListItemIcon>
+                  <Link href={account.path} underline="none" >
+                  <Typography textAlign="center">{account.title}</Typography>
+                  </Link>
+                </MenuItem>
+               ))}
+               </>
+               )
+
+}
             </Menu>
           </Box>
         </Toolbar>

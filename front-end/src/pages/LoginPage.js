@@ -7,16 +7,15 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { UserContext } from "../components/UserContext";
 import { useAuth } from "../components/AuthProvider";
 
+
 const theme = createTheme();
 const port = 4000;
-//const { setAuth } = useAuth();
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
-  const [redirect, setRedirect] = useState(false);
   const { setUserInfo } = useContext(UserContext);
   const {setAuth} = useAuth();
   const navigate = useNavigate();
@@ -36,6 +35,7 @@ const LoginPage = () => {
 
     if (email && password) {
       console.log(email, password);
+      
       const response = await fetch(`http://localhost:${port}/login`, {
         method: "POST",
         body: JSON.stringify({ email, password }),
@@ -44,8 +44,7 @@ const LoginPage = () => {
       });
       if (response.ok) {
         response.json().then((userInfo) => {
-          setUserInfo(userInfo);
-          //  setRedirect(true);
+          setUserInfo(userInfo);         
           console.log(userInfo);
          // console.log(userInfo.Code);
           if (userInfo.Code === 11111) {
@@ -57,13 +56,9 @@ const LoginPage = () => {
         });
       } else {
         alert("wrong credentials");
-      }
     }
-    /* if(redirect) {
-      console.log("Redirect : "+ redirect)
-      return <Navigate to={'/dashboard'} />
-    } */
   };
+}
 
   return (
     <ThemeProvider theme={theme}>

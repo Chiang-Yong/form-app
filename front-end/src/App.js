@@ -1,5 +1,5 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { Children } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import Navbar from "./components/Navbar";
@@ -16,10 +16,15 @@ import { useAuth } from "./components/AuthProvider";
 
 function App() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
+
+  const PrivateRoute = ({ auth, children }) => {
+    return auth ? children : navigate("/home");
+  };
 
   return (
     <>
-      <UserContextProvider>
+      <UserContextProvider> 
         {auth ? <AuthNavbar /> : <Navbar />}
         <Routes>
           <Route path="/" element={<Layout />} />
@@ -30,10 +35,17 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
           <Route path="/logout" element={<Home />} />
         </Routes>
-      </UserContextProvider>
+      </UserContextProvider> 
     </>
   );
 }
