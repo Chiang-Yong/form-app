@@ -2,23 +2,27 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./UserContext";
+import Navbar from "./Navbar";
+import AuthNavbar from "./AuthNavbar";
+import Products from "../pages/Products";
 
-const Port = 5000;
+//const port = 4000;
 
 const Header = () => {
   const { setUserInfo, userInfo } = useContext(UserContext);
   useEffect(() => {
-    fetch(`http://localhost:${Port}/profile`, {
+    fetch(`http://localhost:4000/profile`, {
       credentials: "include",
+      
     }).then((response) => {
-      response.json().then((userInfo) => {
+      response.json().then(userInfo => {
         setUserInfo(userInfo);
       });
     });
   }, []);
 
   function logout() {
-    fetch(`http://localhost:${Port}/logout`, {
+    fetch(`http://localhost:4000/logout`, {
       credentials: "include",
       method: "POST",
     });
@@ -29,20 +33,20 @@ const Header = () => {
 
   return (
     <header>
-      <Link to="/" className="logo">
-        MyBlog
-      </Link>
+     {/*  <Link to="/" className="logo">
+        HCY
+      </Link> */}
       <nav>
         {email && (
           <>
             <Link to="/profile">Profile</Link>
-            <a onClick={logout}>Logout ({username})</a>
+            <a onClick={logout}>Logout ({email})</a>
           </>
         )}
         {!email && (
           <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            <Navbar />
+            
           </>
         )}
       </nav>

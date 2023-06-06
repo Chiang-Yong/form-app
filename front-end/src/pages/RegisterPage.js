@@ -26,7 +26,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [roles, setRoles]=useState("user");
-  const [termPolicy, setTermPolicy] = useState("undefined");
+  const [termPolicy, setTermPolicy] = useState(true);
 
   const [firstNameError, setFirstNameError] = useState(false);
   const [lastNameError, setLastNameError] = useState(false);
@@ -57,7 +57,7 @@ const RegisterPage = () => {
     if (password === "") {
       setPasswordError(true);
     }
-    if (termPolicy === null || termPolicy === undefined) {
+    if (termPolicy === false) {
       console.log("Term Policy is: " + termPolicy);
       setTermPolicyError(true);
       console.log("Term Policy Error: " + termPolicyError);
@@ -68,19 +68,19 @@ const RegisterPage = () => {
       lastName &&
       email &&
       password &&
-      (termPolicy !== null && termPolicy !== "undefined")
+      (termPolicy)
     ) {
             
       const data = new FormData(event.currentTarget);
       data.roles=setRoles("user")
-      console.log(
+    /*  console.log(
         "Any Errors: Fristname: " +
           firstNameError +
           ", Lastname: " +
           lastNameError +
           ", TermPolicy: " +
           termPolicyError
-      );
+      ); */
       console.log({
         FirstName: data.get("firstName"),
         LastName: data.get("lastName"),
@@ -98,12 +98,27 @@ const RegisterPage = () => {
         }
       )
         .then((response) => {
-          console.log("Server response:" + response.data); //response from server port 4000 register end-point
+          console.log("Server response:" + JSON.stringify(response.data)); //response from server port 4000 register end-point
           alert("registration successful");
         })
         .catch((error) => {
           console.error(error);
+          
+          if(error.response){
+            console.log("Error response data: " + error.response.data.code)
+            console.log("Error response header: " + error.response.headers)
+            console.log("Error response status: " + error.response.status)
+            if(error.response.data.code === 11000){
+              alert("Email already exits: " + JSON.stringify(error.response.data.keyValue)
+        )}
+          }
+          else if(error.request){
+            console.log("Error request : " + error.request)
+          }else
+          {
+            console.log(error.message)
           alert("registraion failed");
+          }
         });
 
       //can use fetch if one preferred
@@ -155,6 +170,7 @@ const RegisterPage = () => {
                     onChange={(e) => setFirstName(e.target.value)}
                     value={firstName}
                     error={firstNameError}
+                    helperText="First Name is required"
                     autoFocus
                   />
                 </Grid>
@@ -168,6 +184,7 @@ const RegisterPage = () => {
                     onChange={(e) => setLastName(e.target.value)}
                     value={lastName}
                     error={lastNameError}
+                    helperText="Last Name is required"
                     autoComplete="family-name"
                   />
                 </Grid>
@@ -182,6 +199,7 @@ const RegisterPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     value={email}
                     error={emailError}
+                    helperText="Email is required"
                     autoComplete="email"
                   />
                 </Grid>
@@ -196,6 +214,7 @@ const RegisterPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     value={password}
                     error={passwordError}
+                    helperText="Password is required"
                     autoComplete="new-password"
                   />
                 </Grid>
@@ -203,13 +222,14 @@ const RegisterPage = () => {
                   <Input
                     //required
                     //fullWidth
+                    error
                     name="roles"
                     //label="roles"
                     type="hidden"
                     id="roles"
-                    onChange={(e) => setRoles("user")}
-                    value={roles}
-                   // error={passwordError}
+                    onChange={(e)=> setRoles("user")}
+                    value="user"
+                   
                    // autoComplete="user"
                   />
                 </Grid>
@@ -218,13 +238,19 @@ const RegisterPage = () => {
                     control={
                       <Checkbox
                         required
+                        id="termPolicy"
                         name="termPolicy"
-                        onChange={(e) => setTermPolicy("accepted")}
+                        checked={termPolicy}
+                        onChange={(e) => setTermPolicy(e.target.checked)}
                         value={termPolicy}
                         error={termPolicyError}
-                        color="primary"
+                        helperText="Kindly click on the checkbox"
+                        color="secondary"
+                        defaultChecked
+                        
                       />
                     }
+                    
                     label="I accept the Terms of Use and the Privacy Policy."
                   />
                 </Grid>
@@ -234,6 +260,7 @@ const RegisterPage = () => {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                color="secondary"
               >
                 Sign Up
               </Button>

@@ -9,20 +9,29 @@ import Blog from "./pages/Blog";
 import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
 import UserContextProvider from "./components/UserContext";
+import Layout from "./components/Layout";
+import AuthNavbar from "./components/AuthNavbar";
+import Profile from "./pages/Profile";
+import { useAuth } from "./components/AuthProvider";
 
 function App() {
+  const { auth } = useAuth();
+
   return (
     <>
-      <Navbar />
       <UserContextProvider>
+        {auth ? <AuthNavbar /> : <Navbar />}
         <Routes>
-          <Route exact path="/" element={<Home />} />
+          <Route path="/" element={<Layout />} />
+          <Route index element={<Home />} />
           <Route path="/Products" element={<Products />} />
           <Route path="Blog" element={<Blog />} />
           <Route path="/About" element={<About />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/logout" element={<Home />} />
         </Routes>
       </UserContextProvider>
     </>

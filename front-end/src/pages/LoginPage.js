@@ -1,13 +1,15 @@
 import React, { useContext, useState } from "react";
 import { TextField, Button, Box } from "@mui/material";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from '@mui/material/CssBaseline';
+import CssBaseline from "@mui/material/CssBaseline";
 import { UserContext } from "../components/UserContext";
+import { useAuth } from "../components/AuthProvider";
 
 const theme = createTheme();
 const port = 4000;
+//const { setAuth } = useAuth();
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +17,9 @@ const LoginPage = () => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [redirect, setRedirect] = useState(false);
-  const {setUserInfo} = useContext(UserContext);
+  const { setUserInfo } = useContext(UserContext);
+  const {setAuth} = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -31,26 +35,35 @@ const LoginPage = () => {
     }
 
     if (email && password) {
-       console.log(email, password);
-       const response = await fetch(`http://localhost:4000/login`,{
-         method: 'POST',
-         body: JSON.stringify({email, password}),
-         headers:{'Content-Type':'application/json'},
-         credentials: 'include',
-       })
-       if (response.ok) {
-         response.json().then(userInfo => {
-        setUserInfo(userInfo);
-        setRedirect(true);
+      console.log(email, password);
+      const response = await fetch(`http://localhost:${port}/login`, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       });
+      if (response.ok) {
+        response.json().then((userInfo) => {
+          setUserInfo(userInfo);
+          //  setRedirect(true);
+          console.log(userInfo);
+         // console.log(userInfo.Code);
+          if (userInfo.Code === 11111) {
+            alert("Email does not exist!");
+          } else if (userInfo.email === email) {
+            setAuth(true)
+            navigate("/dashboard");
+          }
+        });
       } else {
-        alert('wrong credentials');
+        alert("wrong credentials");
       }
     }
-    if (redirect) {
+    /* if(redirect) {
+      console.log("Redirect : "+ redirect)
       return <Navigate to={'/dashboard'} />
-    }
-  }
+    } */
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -78,6 +91,7 @@ const LoginPage = () => {
               name="email"
               value={email}
               error={emailError}
+              helperText="Email is required"
               focused
             />
             <TextField
@@ -90,6 +104,7 @@ const LoginPage = () => {
               name="password"
               value={password}
               error={passwordError}
+              helperText="Password is required"
               fullWidth
               sx={{ mb: 3 }}
             />

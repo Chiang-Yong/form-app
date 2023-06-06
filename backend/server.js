@@ -101,11 +101,12 @@ app.post("/login", async (req, res) => {
  // console.log("User Email: " + userDoc.email);
  // console.log("User Password: " + password);
   if(!userDoc){
-    console.log("user does not exist!!!");
-    return res.send({Error:'User does not exist!!!'});   
+    console.log("User does not exist!");
+    const errorMsg = {Code: 11111, Error:'User does not exist!!!'};
+    return res.send(errorMsg);   
   } 
  const passOK = bcrypt.compareSync(password, userDoc.password);
- //  const passOK = true;
+
   if (passOK) {
     jwt.sign({ email, id: userDoc._id }, secret, {}, (err, token) => {
       if (err) throw err;
