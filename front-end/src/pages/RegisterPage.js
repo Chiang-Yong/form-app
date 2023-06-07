@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -33,6 +33,8 @@ const RegisterPage = () => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [termPolicyError, setTermPolicyError] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -100,6 +102,7 @@ const RegisterPage = () => {
         .then((response) => {
           console.log("Server response:" + JSON.stringify(response.data)); //response from server port 4000 register end-point
           alert("registration successful");
+          navigate("/login");
         })
         .catch((error) => {
           console.error(error);
@@ -218,7 +221,7 @@ const RegisterPage = () => {
                     autoComplete="new-password"
                   />
                 </Grid>
-                <Grid item xs={12}>
+     {/*           <Grid item xs={12}>
                   <Input
                     //required
                     //fullWidth
@@ -232,7 +235,7 @@ const RegisterPage = () => {
                    
                    // autoComplete="user"
                   />
-                </Grid>
+                </Grid> */} 
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={
